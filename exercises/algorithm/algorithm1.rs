@@ -2,8 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
-
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
@@ -69,13 +67,76 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+
+}
+
+impl<T: std::cmp::PartialOrd + Clone> LinkedList<T> {
+    fn pop_head(&mut self) -> Option<T> {
+        if self.length == 0 {
+            None
+        }
+        else if self.length == 1 {
+            let p = self.start.clone().unwrap();
+            let val = unsafe {
+                let v = (*p.as_ptr()).val.clone();
+                self.start = (*p.as_ptr()).next.clone();
+                v
+            };
+            self.start = None;
+            self.end = None;
+            self.length = 0;
+            Some(val)
+        }
+        else {
+            let p = self.start.clone().unwrap();
+            let val = unsafe {
+                let v = (*p.as_ptr()).val.clone();
+                self.start = (*p.as_ptr()).next.clone();
+                v
+            };
+            self.length -= 1;
+            Some(val)
+        }
+    }
+
+
+	pub fn merge(mut list_a: LinkedList<T>, mut list_b: LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let (head_a, head_b) = (list_a.get(0), list_b.get(0));
+        if head_a.is_none() {
+            return list_b;
+        }
+        else if head_b.is_none() {
+            return list_a;
+        }
+        else {
+            let mut list_c = LinkedList::new();
+            let (mut head_a, mut head_b) = (list_a.pop_head(), list_b.pop_head());
+            loop {
+                if head_a.is_none() && head_b.is_none() {
+                    break;
+                }
+                else if head_a.is_none() {
+                    list_c.add(head_b.clone().unwrap());
+                    head_b = list_b.pop_head();
+                }
+                else if head_b.is_none() {
+                    list_c.add(head_a.clone().unwrap());
+                    head_a = list_a.pop_head();
+                }
+                else {
+                    let (a, b) = (head_a.clone().unwrap(), head_b.clone().unwrap());
+                    if a < b {
+                        list_c.add(a);
+                        head_a = list_a.pop_head();
+                    }
+                    else {
+                        list_c.add(b);
+                        head_b = list_b.pop_head();
+                    }
+                }
+            }
+            return list_c;
         }
 	}
 }

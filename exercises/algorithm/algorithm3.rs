@@ -3,11 +3,30 @@
 	This problem requires you to implement a sorting algorithm
 	you can use bubble sorting, insertion sorting, heap sorting, etc.
 */
-// I AM NOT DONE
-
-fn sort<T>(array: &mut [T]){
-	//TODO
+fn sort<T: std::cmp::PartialOrd + Copy + std::fmt::Debug>(array: &mut [T]){
+    if array.len() <= 1 {
+        return;
+    }
+    println!("array = {:?}", array);
+    let pivot = array[0].clone();
+    let mut left = 1;
+    for right in 1..array.len() {
+        if array[right] <= pivot {
+            let swap = array[right];
+            array[right] = array[left];
+            array[left] = swap;
+            left += 1;
+        }
+    }
+    let swap = array[left - 1];
+    array[left - 1] = pivot;
+    array[0] = swap;
+    sort(&mut array[..left - 1]);
+    if left < array.len() {
+        sort(&mut array[left..]);
+    }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
